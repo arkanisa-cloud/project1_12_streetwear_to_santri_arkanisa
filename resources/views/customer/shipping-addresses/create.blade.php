@@ -1,0 +1,385 @@
+@extends('layouts.customer')
+
+@section('title', 'Add New Address')
+
+@section('breadcrumb')
+    <li class="text-zinc-500 hover:text-zinc-950 transition-colors cursor-pointer"><a
+            href="{{ route('customer.addresses.index') }}">Vault / Addresses</a></li>
+    <li class="text-zinc-950 italic underline underline-offset-4">/ Add New</li>
+@endsection
+
+@section('content')
+    <div class="max-w-4xl mx-auto px-6 py-12" x-data="shippingAddressForm()">
+        {{-- Header Page --}}
+        <div class="mb-12 border-b border-zinc-100 pb-8">
+            <h1 class="text-4xl font-black italic tracking-tighter uppercase">Add <span class="text-zinc-400">Address</span>
+            </h1>
+            <p class="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.3em] mt-2">Create a new shipping destination.
+            </p>
+        </div>
+
+        <div class="bg-white border border-zinc-100 rounded-3xl p-8">
+            <form action="{{ route('customer.addresses.store', ['redirect' => request('redirect')]) }}" method="POST">
+                @csrf
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="space-y-3">
+                        <label for="recipient_name"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">Recipient Name
+                            <span class="text-red-500">*</span></label>
+                        <input type="text" name="recipient_name" id="recipient_name"
+                            class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all duration-300 hover:border-zinc-300 @error('recipient_name') border-red-500 @enderror"
+                            value="{{ old('recipient_name') }}" placeholder="e.g. John Doe" required>
+                        @error('recipient_name')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="space-y-3">
+                        <label for="phone"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">Phone Number <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" name="phone" id="phone"
+                            class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all duration-300 hover:border-zinc-300 @error('phone') border-red-500 @enderror"
+                            value="{{ old('phone') }}" placeholder="e.g. 08123456789" required>
+                        @error('phone')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="md:col-span-2 space-y-3">
+                        <label for="address"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">Full Address <span
+                                class="text-red-500">*</span></label>
+                        <textarea name="address" id="address"
+                            class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-medium tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all duration-300 hover:border-zinc-300 @error('address') border-red-500 @enderror"
+                            rows="3" placeholder="Street name, building, house number..." required>{{ old('address') }}</textarea>
+                        @error('address')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="space-y-3">
+                        <label for="province_id"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">Province <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select name="province_id" id="province_id"
+                                class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 appearance-none cursor-pointer transition-all duration-300 hover:border-zinc-300 @error('province_id') border-red-500 @enderror"
+                                x-model="selectedProvinceId" @change="onProvinceChange()" required>
+                                <option value="">-- Select Province --</option>
+                                <template x-for="prov in provinces" :key="prov.id">
+                                    <option :value="prov.id" x-text="prov.name"></option>
+                                </template>
+                            </select>
+                            <div
+                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-950">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <input type="hidden" name="province" :value="selectedProvinceName">
+                        @error('province_id')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                        <div class="form-text mt-2 flex items-center gap-2" x-show="loadingProvinces">
+                            <span
+                                class="inline-block w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
+                                provinces...</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label for="city_id"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">City/Regency <span
+                                class="text-red-500">*</span></label>
+                        <div class="relative">
+                            <select name="city_id" id="city_id"
+                                class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 appearance-none cursor-pointer transition-all duration-300 hover:border-zinc-300 @error('city_id') border-red-500 @enderror disabled:opacity-50 disabled:cursor-not-allowed"
+                                x-model="selectedCityId" @change="onCityChange()"
+                                :disabled="!selectedProvinceId || loadingCities" required>
+                                <option value="">-- Select City --</option>
+                                <template x-for="city in cities" :key="city.id">
+                                    <option :value="city.id" x-text="city.name"></option>
+                                </template>
+                            </select>
+                            <div
+                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-950">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <input type="hidden" name="city" :value="selectedCityName">
+                        @error('city_id')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                        <div class="form-text mt-2 flex items-center gap-2" x-show="loadingCities">
+                            <span
+                                class="inline-block w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
+                                cities...</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" x-show="districts.length > 0 || loadingDistricts">
+                        <label for="district_id"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">District /
+                            Kecamatan</label>
+                        <div class="relative">
+                            <select name="district_id" id="district_id"
+                                class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 appearance-none cursor-pointer transition-all duration-300 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                x-model="selectedDistrictId" @change="onDistrictChange()"
+                                :disabled="!selectedCityId || loadingDistricts">
+                                <option value="">-- Select District --</option>
+                                <template x-for="district in districts" :key="district.id">
+                                    <option :value="district.id" x-text="district.name"></option>
+                                </template>
+                            </select>
+                            <div
+                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-950">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <input type="hidden" name="district" :value="selectedDistrictName">
+                        @error('district_id')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                        <div class="form-text mt-2 flex items-center gap-2" x-show="loadingDistricts">
+                            <span
+                                class="inline-block w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
+                                districts...</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3" x-show="subdistricts.length > 0 || loadingSubdistricts">
+                        <label for="subdistrict_id"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">Sub-district /
+                            Kelurahan</label>
+                        <div class="relative">
+                            <select name="subdistrict_id" id="subdistrict_id"
+                                class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 appearance-none cursor-pointer transition-all duration-300 hover:border-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                x-model="selectedSubdistrictId" @change="onSubdistrictChange()"
+                                :disabled="!selectedDistrictId || loadingSubdistricts">
+                                <option value="">-- Select Sub-district --</option>
+                                <template x-for="sub in subdistricts" :key="sub.id">
+                                    <option :value="sub.id" x-text="sub.name"></option>
+                                </template>
+                            </select>
+                            <div
+                                class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-zinc-950">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <input type="hidden" name="subdistrict" :value="selectedSubdistrictName">
+                        @error('subdistrict_id')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                        <div class="form-text mt-2 flex items-center gap-2" x-show="loadingSubdistricts">
+                            <span
+                                class="inline-block w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></span>
+                            <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
+                                subdistricts...</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <label for="postal_code"
+                            class="block text-[10px] font-black uppercase tracking-widest text-zinc-950">Postal Code <span
+                                class="text-red-500">*</span></label>
+                        <input type="text" name="postal_code" id="postal_code"
+                            class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 transition-all duration-300 hover:border-zinc-300 @error('postal_code') border-red-500 @enderror"
+                            value="{{ old('postal_code') }}" placeholder="e.g. 55561" required>
+                        @error('postal_code')
+                            <p class="text-xs font-bold text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-center gap-4 pt-6 border-t border-zinc-100">
+                    <button type="submit"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-zinc-950 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-xl hover:bg-white hover:text-zinc-950 border border-zinc-950 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        :disabled="!selectedProvinceId || !selectedCityId || !selectedDistrictId">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                            </path>
+                        </svg>
+                        Save Address
+                    </button>
+                    <a href="{{ request('redirect') === 'checkout' ? route('customer.checkout.index') : route('customer.addresses.index') }}"
+                        class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-zinc-950 text-[10px] font-black uppercase tracking-[0.2em] rounded-xl border border-zinc-200 hover:border-zinc-950 transition-all duration-300">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function shippingAddressForm() {
+            return {
+                provinces: [],
+                cities: [],
+                districts: [],
+                subdistricts: [],
+
+                selectedProvinceId: '{{ old('province_id', '') }}',
+                selectedProvinceName: '{{ old('province', '') }}',
+                selectedCityId: '{{ old('city_id', '') }}',
+                selectedCityName: '{{ old('city', '') }}',
+                selectedDistrictId: '{{ old('district_id', '') }}',
+                selectedDistrictName: '{{ old('district', '') }}',
+                selectedSubdistrictId: '{{ old('subdistrict_id', '') }}',
+                selectedSubdistrictName: '{{ old('subdistrict', '') }}',
+
+                loadingProvinces: false,
+                loadingCities: false,
+                loadingDistricts: false,
+                loadingSubdistricts: false,
+
+                init() {
+                    this.fetchProvinces();
+                },
+
+                async fetchProvinces() {
+                    this.loadingProvinces = true;
+                    try {
+                        const res = await fetch('{{ route('customer.api.rajaongkir.provinces') }}');
+                        const data = await res.json();
+                        if (data.success) {
+                            this.provinces = data.data;
+                        }
+                        if (this.selectedProvinceId) {
+                            await this.fetchCities(this.selectedProvinceId);
+                        }
+                    } catch (e) {
+                        console.error('Failed to load provinces:', e);
+                    } finally {
+                        this.loadingProvinces = false;
+                    }
+                },
+
+                async fetchCities(provinceId) {
+                    this.loadingCities = true;
+                    try {
+                        const res = await fetch(
+                            `{{ route('customer.api.rajaongkir.cities', ['provinceId' => ':provinceId']) }}`
+                            .replace(':provinceId', provinceId));
+                        const data = await res.json();
+                        if (data.success) {
+                            this.cities = data.data;
+                        }
+                        if (this.selectedCityId) {
+                            await this.fetchDistricts(this.selectedCityId);
+                        }
+                    } catch (e) {
+                        console.error('Failed to load cities:', e);
+                    } finally {
+                        this.loadingCities = false;
+                    }
+                },
+
+                async fetchDistricts(cityId) {
+                    this.loadingDistricts = true;
+                    try {
+                        const res = await fetch(
+                            `{{ route('customer.api.rajaongkir.districts', ['cityId' => ':cityId']) }}`
+                            .replace(':cityId', cityId));
+                        const data = await res.json();
+                        if (data.success) {
+                            this.districts = data.data;
+                        }
+                        if (this.selectedDistrictId) {
+                            await this.fetchSubdistricts(this.selectedDistrictId);
+                        }
+                    } catch (e) {
+                        console.error('Failed to load districts:', e);
+                    } finally {
+                        this.loadingDistricts = false;
+                    }
+                },
+
+                async fetchSubdistricts(districtId) {
+                    this.loadingSubdistricts = true;
+                    try {
+                        const res = await fetch(
+                            `{{ route('customer.api.rajaongkir.subdistricts', ['districtId' => ':districtId']) }}`
+                            .replace(':districtId', districtId));
+                        const data = await res.json();
+                        if (data.success) {
+                            this.subdistricts = data.data;
+                        }
+                    } catch (e) {
+                        console.error('Failed to load subdistricts:', e);
+                    } finally {
+                        this.loadingSubdistricts = false;
+                    }
+                },
+
+                onProvinceChange() {
+                    this.selectedCityId = '';
+                    this.selectedCityName = '';
+                    this.selectedDistrictId = '';
+                    this.selectedDistrictName = '';
+                    this.selectedSubdistrictId = '';
+                    this.selectedSubdistrictName = '';
+                    this.cities = [];
+                    this.districts = [];
+                    this.subdistricts = [];
+
+                    const prov = this.provinces.find(p => p.id == this.selectedProvinceId);
+                    this.selectedProvinceName = prov ? prov.name : '';
+
+                    if (this.selectedProvinceId) {
+                        this.fetchCities(this.selectedProvinceId);
+                    }
+                },
+
+                onCityChange() {
+                    this.selectedDistrictId = '';
+                    this.selectedDistrictName = '';
+                    this.selectedSubdistrictId = '';
+                    this.selectedSubdistrictName = '';
+                    this.districts = [];
+                    this.subdistricts = [];
+
+                    const city = this.cities.find(c => c.id == this.selectedCityId);
+                    this.selectedCityName = city ? city.name : '';
+
+                    if (this.selectedCityId) {
+                        this.fetchDistricts(this.selectedCityId);
+                    }
+                },
+
+                onDistrictChange() {
+                    this.selectedSubdistrictId = '';
+                    this.selectedSubdistrictName = '';
+                    this.subdistricts = [];
+
+                    const district = this.districts.find(d => d.id == this.selectedDistrictId);
+                    this.selectedDistrictName = district ? district.name : '';
+
+                    if (this.selectedDistrictId) {
+                        this.fetchSubdistricts(this.selectedDistrictId);
+                    }
+                },
+
+                onSubdistrictChange() {
+                    const sub = this.subdistricts.find(s => s.id == this.selectedSubdistrictId);
+                    this.selectedSubdistrictName = sub ? sub.name : '';
+                },
+            }
+        }
+    </script>
+@endsection

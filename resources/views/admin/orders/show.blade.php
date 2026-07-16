@@ -139,7 +139,8 @@
                             </tbody>
                             <tfoot class="border-t border-zinc-100 text-xs font-bold text-zinc-800">
                                 <tr>
-                                    <td colspan="3" class="pt-4 text-right text-[9px] font-black uppercase tracking-widest text-zinc-400">
+                                    <td colspan="3"
+                                        class="pt-4 text-right text-[9px] font-black uppercase tracking-widest text-zinc-400">
                                         Subtotal Produk:
                                     </td>
                                     <td class="pt-4 text-right italic font-medium text-zinc-700">
@@ -147,29 +148,33 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td colspan="3" class="py-2 text-right text-[9px] font-black uppercase tracking-widest text-zinc-400">
-                                        Ongkos Kirim ({{ strtoupper($order->shipping_courier) }} - {{ $order->shipping_service }}):
+                                    <td colspan="3"
+                                        class="py-2 text-right text-[9px] font-black uppercase tracking-widest text-zinc-400">
+                                        Ongkos Kirim ({{ strtoupper($order->shipping_courier) }} -
+                                        {{ $order->shipping_service }}):
                                     </td>
                                     <td class="py-2 text-right italic font-medium text-zinc-700">
                                         IDR {{ number_format($order->shipping_cost, 0, ',', '.') }}
                                     </td>
                                 </tr>
-                                 <tr>
-                                     <td colspan="3" class="py-2 text-right text-[9px] font-black uppercase tracking-widest text-zinc-400">
-                                         Metode Pembayaran:
-                                     </td>
-                                     <td class="py-2 text-right text-xs font-black uppercase text-zinc-950 italic">
-                                         {{ $order->payment->payment_method_label ?? '-' }}
-                                     </td>
-                                 </tr>
-                                 <tr class="border-t border-zinc-950">
-                                     <td colspan="3" class="pt-4 text-right text-[10px] font-black uppercase tracking-widest text-zinc-950">
-                                         Grand Total Dana:
-                                     </td>
-                                     <td class="pt-4 text-right text-sm font-black italic text-zinc-950">
-                                         {{ $order->formatted_total }}
-                                     </td>
-                                 </tr>
+                                <tr>
+                                    <td colspan="3"
+                                        class="py-2 text-right text-[9px] font-black uppercase tracking-widest text-zinc-400">
+                                        Metode Pembayaran:
+                                    </td>
+                                    <td class="py-2 text-right text-xs font-black uppercase text-zinc-950 italic">
+                                        {{ $order->payment->payment_method_label ?? '-' }}
+                                    </td>
+                                </tr>
+                                <tr class="border-t border-zinc-950">
+                                    <td colspan="3"
+                                        class="pt-4 text-right text-[10px] font-black uppercase tracking-widest text-zinc-950">
+                                        Grand Total Dana:
+                                    </td>
+                                    <td class="pt-4 text-right text-sm font-black italic text-zinc-950">
+                                        {{ $order->formatted_total }}
+                                    </td>
+                                </tr>
                             </tfoot>
                         </table>
                     </div>
@@ -187,7 +192,8 @@
                         <span class="w-1.5 h-3 bg-zinc-950 block"></span> Status Keuangan
                     </h2>
 
-                    <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-50 pb-3">
+                    <div
+                        class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-zinc-400 border-b border-zinc-50 pb-3">
                         <span>Metode Pembayaran:</span>
                         <span class="text-zinc-950 italic">{{ $order->payment->payment_method_label ?? '-' }}</span>
                     </div>
@@ -207,35 +213,6 @@
                                 <span>⚠ Belum Ada Data Transfer</span>
                             </div>
                         @endif
-                    @elseif($order->payment_status === 'pending')
-                        <div
-                            class="p-3 bg-zinc-950 text-white text-center text-xs font-black uppercase tracking-wider italic rounded-xl animate-pulse">
-                            Audit Diperlukan
-                        </div>
-
-                        {{-- Tombol Lihat Bukti --}}
-                        @if ($order->payment->proof)
-                            <button type="button" @click="proofModal = true"
-                                class="w-full py-2.5 bg-zinc-100 text-zinc-950 hover:bg-zinc-200 transition-all rounded-xl text-xs font-black uppercase tracking-widest text-center border border-zinc-200">
-                                Lihat Gambar Bukti 👁
-                            </button>
-                        @endif
-
-                        {{-- Tombol Aksi Persetujuan / Penolakan --}}
-                        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-zinc-50">
-                            <form action="{{ route('admin.orders.verifyPayment', $order) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="status" value="verified">
-                                <button type="submit"
-                                    class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider rounded-lg transition-all shadow-sm">
-                                    Terima (Paid)
-                                </button>
-                            </form>
-                            <button type="button" @click="rejectModal = true"
-                                class="w-full py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all border border-rose-100">
-                                Tolak Berkas
-                            </button>
-                        </div>
                     @elseif($order->payment_status === 'paid')
                         <div
                             class="p-3.5 bg-emerald-50 border border-emerald-100 rounded-xl text-xs font-bold text-emerald-700 italic flex items-center gap-2">
@@ -262,7 +239,8 @@
                         @if ($order->payment->admin_notes)
                             <div
                                 class="p-3.5 bg-zinc-50 border border-zinc-100 rounded-xl text-xs text-zinc-600 leading-relaxed">
-                                <strong class="text-[9px] font-black uppercase text-rose-600 block mb-0.5">Catatan Penolakan
+                                <strong class="text-[9px] font-black uppercase text-rose-600 block mb-0.5">Catatan
+                                    Penolakan
                                     Admin:</strong>
                                 {{ $order->payment->admin_notes }}
                             </div>

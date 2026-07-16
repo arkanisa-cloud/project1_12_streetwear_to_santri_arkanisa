@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Mencegah Alpine.js FOUC (Flash of Unstyled Content) */
+[x-cloak] {
+    display: none !important;
+}

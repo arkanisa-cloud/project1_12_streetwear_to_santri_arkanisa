@@ -45,8 +45,12 @@ class Payment extends Model
     public function getPaymentMethodLabelAttribute(): string
     {
         return match($this->payment_method) {
+<<<<<<< HEAD
             'transfer' => 'Transfer Bank',
             'ewallet' => 'E-Wallet',
+=======
+            'midtrans' => 'Midtrans',
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
             'cod' => 'Cash on Delivery (COD)',
             default => 'Unknown',
         };

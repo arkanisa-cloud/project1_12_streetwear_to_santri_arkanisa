@@ -109,6 +109,10 @@
                             <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
                                 provinces...</span>
                         </div>
+                        <div class="mt-2 flex items-center gap-2" x-show="errorProvinces && !loadingProvinces" x-cloak>
+                            <span class="text-[10px] font-bold text-red-500" x-text="errorProvinces"></span>
+                            <button type="button" @click="retryProvinces()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
+                        </div>
                     </div>
 
                     <!-- City select -->
@@ -143,6 +147,10 @@
                                 class="inline-block w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></span>
                             <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
                                 cities...</span>
+                        </div>
+                        <div class="mt-2 flex items-center gap-2" x-show="errorCities && !loadingCities" x-cloak>
+                            <span class="text-[10px] font-bold text-red-500" x-text="errorCities"></span>
+                            <button type="button" @click="retryCities()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
                         </div>
                     </div>
 
@@ -179,6 +187,10 @@
                             <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
                                 districts...</span>
                         </div>
+                        <div class="mt-2 flex items-center gap-2" x-show="errorDistricts && !loadingDistricts" x-cloak>
+                            <span class="text-[10px] font-bold text-red-500" x-text="errorDistricts"></span>
+                            <button type="button" @click="retryDistricts()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
+                        </div>
                     </div>
 
                     <!-- Sub-district (Kelurahan) select -->
@@ -213,6 +225,10 @@
                                 class="inline-block w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></span>
                             <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
                                 subdistricts...</span>
+                        </div>
+                        <div class="mt-2 flex items-center gap-2" x-show="errorSubdistricts && !loadingSubdistricts" x-cloak>
+                            <span class="text-[10px] font-bold text-red-500" x-text="errorSubdistricts"></span>
+                            <button type="button" @click="retrySubdistricts()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
                         </div>
                     </div>
 
@@ -272,16 +288,22 @@
                 loadingDistricts: false,
                 loadingSubdistricts: false,
 
+                errorProvinces: '',
+                errorCities: '',
+                errorDistricts: '',
+                errorSubdistricts: '',
+
                 init() {
                     this.fetchProvinces();
                 },
 
                 async fetchProvinces() {
                     this.loadingProvinces = true;
+                    this.errorProvinces = '';
                     try {
                         const res = await fetch('{{ route('customer.api.rajaongkir.provinces') }}');
                         const data = await res.json();
-                        if (data.success) {
+                        if (data.success && data.data.length > 0) {
                             this.provinces = data.data;
                             
                             // Resolve province name
@@ -289,12 +311,15 @@
                             if (prov) {
                                 this.selectedProvinceName = prov.name;
                             }
+                        } else {
+                            this.errorProvinces = data.message || 'Gagal memuat provinsi. Klik untuk coba lagi.';
                         }
                         if (this.selectedProvinceId) {
                             await this.fetchCities(this.selectedProvinceId);
                         }
                     } catch (e) {
                         console.error('Failed to load provinces:', e);
+                        this.errorProvinces = 'Koneksi gagal. Klik untuk coba lagi.';
                     } finally {
                         this.loadingProvinces = false;
                     }
@@ -302,12 +327,13 @@
 
                 async fetchCities(provinceId) {
                     this.loadingCities = true;
+                    this.errorCities = '';
                     try {
                         const res = await fetch(
                             `{{ route('customer.api.rajaongkir.cities', ['provinceId' => ':provinceId']) }}`
                             .replace(':provinceId', provinceId));
                         const data = await res.json();
-                        if (data.success) {
+                        if (data.success && data.data.length > 0) {
                             this.cities = data.data;
                             
                             // Resolve city name
@@ -315,12 +341,15 @@
                             if (city) {
                                 this.selectedCityName = city.name;
                             }
+                        } else {
+                            this.errorCities = data.message || 'Gagal memuat kota. Klik untuk coba lagi.';
                         }
                         if (this.selectedCityId) {
                             await this.fetchDistricts(this.selectedCityId);
                         }
                     } catch (e) {
                         console.error('Failed to load cities:', e);
+                        this.errorCities = 'Koneksi gagal. Klik untuk coba lagi.';
                     } finally {
                         this.loadingCities = false;
                     }
@@ -328,12 +357,13 @@
 
                 async fetchDistricts(cityId) {
                     this.loadingDistricts = true;
+                    this.errorDistricts = '';
                     try {
                         const res = await fetch(
                             `{{ route('customer.api.rajaongkir.districts', ['cityId' => ':cityId']) }}`
                             .replace(':cityId', cityId));
                         const data = await res.json();
-                        if (data.success) {
+                        if (data.success && data.data.length > 0) {
                             this.districts = data.data;
                             
                             // Resolve district name
@@ -341,12 +371,15 @@
                             if (district) {
                                 this.selectedDistrictName = district.name;
                             }
+                        } else {
+                            this.errorDistricts = data.message || 'Gagal memuat kecamatan. Klik untuk coba lagi.';
                         }
                         if (this.selectedDistrictId) {
                             await this.fetchSubdistricts(this.selectedDistrictId);
                         }
                     } catch (e) {
                         console.error('Failed to load districts:', e);
+                        this.errorDistricts = 'Koneksi gagal. Klik untuk coba lagi.';
                     } finally {
                         this.loadingDistricts = false;
                     }
@@ -354,12 +387,13 @@
 
                 async fetchSubdistricts(districtId) {
                     this.loadingSubdistricts = true;
+                    this.errorSubdistricts = '';
                     try {
                         const res = await fetch(
                             `{{ route('customer.api.rajaongkir.subdistricts', ['districtId' => ':districtId']) }}`
                             .replace(':districtId', districtId));
                         const data = await res.json();
-                        if (data.success) {
+                        if (data.success && data.data.length > 0) {
                             this.subdistricts = data.data;
                             
                             // Resolve stored subdistrict (Kelurahan) name and ID by matching string
@@ -372,11 +406,40 @@
                                     this.selectedSubdistrictName = found.name;
                                 }
                             }
+                        } else {
+                            this.errorSubdistricts = data.message || 'Gagal memuat kelurahan. Klik untuk coba lagi.';
                         }
                     } catch (e) {
                         console.error('Failed to load subdistricts:', e);
+                        this.errorSubdistricts = 'Koneksi gagal. Klik untuk coba lagi.';
                     } finally {
                         this.loadingSubdistricts = false;
+                    }
+                },
+
+                retryProvinces() {
+                    this.provinces = [];
+                    this.fetchProvinces();
+                },
+
+                retryCities() {
+                    this.cities = [];
+                    if (this.selectedProvinceId) {
+                        this.fetchCities(this.selectedProvinceId);
+                    }
+                },
+
+                retryDistricts() {
+                    this.districts = [];
+                    if (this.selectedCityId) {
+                        this.fetchDistricts(this.selectedCityId);
+                    }
+                },
+
+                retrySubdistricts() {
+                    this.subdistricts = [];
+                    if (this.selectedDistrictId) {
+                        this.fetchSubdistricts(this.selectedDistrictId);
                     }
                 },
 
@@ -391,6 +454,9 @@
                     this.cities = [];
                     this.districts = [];
                     this.subdistricts = [];
+                    this.errorCities = '';
+                    this.errorDistricts = '';
+                    this.errorSubdistricts = '';
 
                     const prov = this.provinces.find(p => p.id == this.selectedProvinceId);
                     this.selectedProvinceName = prov ? prov.name : '';
@@ -408,6 +474,8 @@
                     this.selectedPostalCode = '';
                     this.districts = [];
                     this.subdistricts = [];
+                    this.errorDistricts = '';
+                    this.errorSubdistricts = '';
 
                     const city = this.cities.find(c => c.id == this.selectedCityId);
                     this.selectedCityName = city ? city.name : '';
@@ -421,6 +489,7 @@
                     this.selectedSubdistrictId = '';
                     this.selectedSubdistrictName = '';
                     this.subdistricts = [];
+                    this.errorSubdistricts = '';
 
                     const district = this.districts.find(d => d.id == this.selectedDistrictId);
                     this.selectedDistrictName = district ? district.name : '';

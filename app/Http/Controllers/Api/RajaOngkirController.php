@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Services\RajaOngkirService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+<<<<<<< HEAD
+=======
+use Illuminate\Support\Facades\Log;
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
 
 /**
  * RajaOngkirController
@@ -48,8 +52,14 @@ class RajaOngkirController extends Controller
         $provinces = $this->rajaOngkir->getProvinces();
 
         return response()->json([
+<<<<<<< HEAD
             'success' => true,
             'data' => $provinces,
+=======
+            'success' => !empty($provinces),
+            'data' => $provinces,
+            'message' => empty($provinces) ? 'Gagal memuat data provinsi. Silakan coba lagi.' : null,
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         ]);
     }
 
@@ -72,8 +82,14 @@ class RajaOngkirController extends Controller
         $cities = $this->rajaOngkir->getCities($provinceId);
 
         return response()->json([
+<<<<<<< HEAD
             'success' => true,
             'data' => $cities,
+=======
+            'success' => !empty($cities),
+            'data' => $cities,
+            'message' => empty($cities) ? 'Gagal memuat data kota. Silakan coba lagi.' : null,
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         ]);
     }
 
@@ -87,7 +103,11 @@ class RajaOngkirController extends Controller
      *   "data": [
      *     { "id": 1, "name": "Banda Raya" },
      *     { "id": 2, "name": "Baiturrahman" },
+<<<<<<< HEAD
      *     ...
+=======
+     *     ..
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
      *   ]
      * }
      */
@@ -96,8 +116,14 @@ class RajaOngkirController extends Controller
         $districts = $this->rajaOngkir->getDistricts($cityId);
 
         return response()->json([
+<<<<<<< HEAD
             'success' => true,
             'data' => $districts,
+=======
+            'success' => !empty($districts),
+            'data' => $districts,
+            'message' => empty($districts) ? 'Gagal memuat data kecamatan. Silakan coba lagi.' : null,
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         ]);
     }
 
@@ -121,8 +147,14 @@ class RajaOngkirController extends Controller
         $subdistricts = $this->rajaOngkir->getSubDistricts($districtId);
 
         return response()->json([
+<<<<<<< HEAD
             'success' => true,
             'data' => $subdistricts,
+=======
+            'success' => !empty($subdistricts),
+            'data' => $subdistricts,
+            'message' => empty($subdistricts) ? 'Gagal memuat data kelurahan. Silakan coba lagi.' : null,
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         ]);
     }
 
@@ -173,8 +205,14 @@ class RajaOngkirController extends Controller
         );
 
         return response()->json([
+<<<<<<< HEAD
             'success' => true,
             'data' => $costs,
+=======
+            'success' => !empty($costs),
+            'data' => $costs,
+            'message' => empty($costs) ? 'Gagal menghitung ongkir. Silakan coba lagi.' : null,
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         ]);
     }
 }

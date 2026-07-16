@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('order_number')->unique(); // Nomor order unik (contoh: ORD-20240104-0001)
             $table->decimal('total', 10, 2); // Total harga pesanan
             $table->enum('status', ['pending', 'processed', 'shipped', 'completed', 'cancelled'])->default('pending'); // Status order
-             $table->string('shipping_courier')->nullable(); // Contoh: jne, pos, tiki
+            $table->string('shipping_courier')->nullable(); // Contoh: jne, pos, tiki
             $table->string('shipping_service')->nullable(); // Contoh: OKE, REG
             $table->decimal('shipping_cost', 10, 2)->nullable()->default(0); // Biaya pengirim
             // $table->string('snap_token')->nullable();

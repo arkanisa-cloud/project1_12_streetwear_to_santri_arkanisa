@@ -26,6 +26,10 @@ class Order extends Model
         'shipping_courier',
         'shipping_service',
         'shipping_cost',
+<<<<<<< HEAD
+=======
+        'snap_token',
+>>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
     ];
 
     /**

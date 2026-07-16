@@ -287,7 +287,7 @@
                             <div class="flex justify-between items-center">
                                 <span class="text-[10px] font-black uppercase tracking-widest text-zinc-500">Barang
                                     Terpilih</span>
-                                <span class="text-sm font-black italic"><span x-text="selectedIds.length"></span>
+                                <span class="text-sm font-black italic">{{ $cart->total_items }}
                                     Item</span>
                             </div>
                             <div class="flex justify-between items-center">

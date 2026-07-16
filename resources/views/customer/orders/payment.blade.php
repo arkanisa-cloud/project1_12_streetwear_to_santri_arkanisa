@@ -23,6 +23,14 @@
                     <span
                         class="bg-zinc-100 text-zinc-600 border border-zinc-200 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-md italic">Menunggu
                         Diproses</span>
+                @elseif($order->status === 'processed')
+                    <span
+                        class="bg-zinc-950 text-white border border-zinc-950 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-md italic">Sedang
+                        Diproses</span>
+                @elseif($order->status === 'shipped')
+                    <span
+                        class="bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-md italic">Sedang
+                        Dikirim</span>
                 @elseif($order->status === 'completed')
                     <span
                         class="bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-md italic">Selesai</span>
@@ -205,7 +213,7 @@
                         <span class="text-zinc-950 italic">{{ $order->payment->payment_method_label ?? '-' }}</span>
                     </div>
 
-                    @if ($order->payment_status === 'unpaid' || $order->payment_status === 'pending')
+                    @if ($order->payment_status === 'unpaid')
                         @if ($order->payment && $order->payment->payment_method === 'cod')
                             <div
                                 class="p-3.5 bg-zinc-100 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-700 italic flex items-center gap-2">
@@ -216,76 +224,19 @@
                                 Anda.
                             </p>
                         @else
-                            @if ($order->payment_status === 'pending')
-                                <div
-                                    class="p-3.5 bg-amber-50/70 border border-amber-100 rounded-xl text-xs font-bold text-amber-700 italic flex items-center gap-2">
-                                    <span>⏳ Menunggu Pembayaran (Midtrans)</span>
-                                </div>
-                            @else
-                                <div
-                                    class="p-3.5 bg-amber-50/70 border border-amber-100 rounded-xl text-xs font-bold text-amber-700 italic flex items-center gap-2">
-                                    <span>⚠ Belum Ada Transaksi Pembayaran</span>
-                                </div>
-                            @endif
+                            <div
+                                class="p-3.5 bg-amber-50/70 border border-amber-100 rounded-xl text-xs font-bold text-amber-700 italic flex items-center gap-2">
+                                <span>⚠ Belum Ada Transaksi Pembayaran</span>
+                            </div>
                         @endif
                         <button id="pay-button"
                             class="w-full mt-2 px-4 py-2 bg-zinc-950 text-white text-xs font-black uppercase tracking-widest rounded-full hover:bg-zinc-800 transition-all active:scale-95">
                             Bayar Sekarang
                         </button>
-                    @elseif($order->payment_status === 'paid')
+                    @elseif ($order->payment_status === 'paid')
                         <div
                             class="p-3.5 bg-emerald-50 border border-emerald-100 rounded-xl text-xs font-bold text-emerald-700 italic flex items-center gap-2">
-                            <span>✓ Pembayaran Selesai!</span>
-                        </div>
-
-                        <div class="text-[10px] font-bold uppercase tracking-wider text-zinc-500 space-y-2 pt-1">
-                            <div class="flex justify-between border-b border-zinc-50 pb-2">
-                                <span>Metode:</span>
-                                <span
-                                    class="text-zinc-950 font-black italic">{{ $order->payment->payment_method_label }}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span>Tanggal:</span>
-                                <span class="text-zinc-950 font-black italic">
-                                    {{ $order->payment->verified_at ? $order->payment->verified_at->translatedFormat('d M Y H:i') : '-' }}
-                                </span>
-                            </div>
-                        </div>
-                    @elseif($order->payment_status === 'rejected')
-                        <div
-                            class="p-3.5 bg-rose-50 border border-rose-100 rounded-xl text-xs font-bold text-rose-700 italic flex items-center gap-2">
-                            <span>✕ Verifikasi Pembayaran Ditolak</span>
-                        </div>
-
-                        @if ($order->payment->admin_notes)
-                            <div class="p-4 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-medium text-zinc-600">
-                                <strong class="text-[9px] font-black uppercase text-rose-600 block mb-1">Alasan
-                                    Penolakan:</strong>
-                                <p class="leading-relaxed">{{ $order->payment->admin_notes }}</p>
-                            </div>
-                        @endif
-
-                        <button type="button" @click="uploadOpen = !uploadOpen"
-                            class="w-full py-3 bg-zinc-950 text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-all rounded-xl text-center shadow-md">
-                            Upload Ulang Bukti
-                        </button>
-
-                        <div x-show="uploadOpen" x-transition x-cloak class="pt-2">
-                            <form action="{{ route('customer.orders.payment', $order) }}" method="POST"
-                                enctype="multipart/form-data"
-                                class="space-y-3.5 p-4 bg-zinc-50 border border-zinc-100 rounded-xl">
-                                @csrf
-                                <div class="space-y-1.5">
-                                    <label class="text-[9px] font-black uppercase tracking-widest text-zinc-400">Bukti
-                                        Transfer Baru</label>
-                                    <input type="file" name="proof" required accept="image/jpeg,image/png,image/jpg"
-                                        class="w-full text-xs text-zinc-600 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-[9px] file:font-black file:uppercase file:tracking-wider file:bg-zinc-950 file:text-white file:cursor-pointer hover:file:bg-zinc-800">
-                                </div>
-                                <button type="submit"
-                                    class="w-full py-2.5 bg-emerald-600 text-white text-[9px] font-black uppercase tracking-widest hover:bg-emerald-700 transition-all rounded-lg text-center">
-                                    Upload Ulang
-                                </button>
-                            </form>
+                            <span>✓ Pembayaran Berhasil</span>
                         </div>
                     @endif
                 </div>
@@ -365,27 +316,6 @@
             </a>
         </div>
 
-        <script>
-            var payButton = document.getElementById('pay-button');
-            if (payButton) {
-                payButton.addEventListener('click', function() {
-                    // Trigger snap popup. Use session snapToken or fallback to order's snap_token
-                    window.snap.pay('{{ session('snapToken') ?? $order->snap_token }}', {
-                        onSuccess: function(result) {
-                            window.location.href = "{{ route('customer.orders.show', $order->id) }}";
-                        },
-                        onPending: function(result) {
-                            window.location.href = "{{ route('customer.orders.show', $order->id) }}";
-                        },
-                        onError: function(result) {
-                            window.location.href = "{{ route('customer.orders.show', $order->id) }}";
-                        },
-                        onClose: function() {
-                            window.location.href = "{{ route('customer.orders.show', $order->id) }}";
-                        }
-                    });
-                });
-            }
-        </script>
     </div>
 @endsection
+

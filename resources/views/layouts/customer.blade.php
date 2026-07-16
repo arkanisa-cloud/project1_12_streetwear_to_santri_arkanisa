@@ -12,6 +12,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="Mid-client-bGLLbrzTBW50U3lL"></script>
 </head>
 
 <body class="bg-white text-zinc-950 antialiased font-sans">
@@ -36,7 +38,8 @@
             {{-- Tengah: Logo --}}
             <div class="absolute left-1/2 -translate-x-1/2 md:static md:translate-x-0">
                 @if (!empty($siteLogo))
-                    <img src="{{ asset('storage/' . $siteLogo) }}" alt="Logo" class="h-11 md:h-14 w-auto object-contain">
+                    <img src="{{ asset('storage/' . $siteLogo) }}" alt="Logo"
+                        class="h-11 md:h-14 w-auto object-contain">
                 @else
                     <span class="text-2xl font-black italic tracking-tighter uppercase">STS<span
                             class="text-zinc-300">.</span></span>

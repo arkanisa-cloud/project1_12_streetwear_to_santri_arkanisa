@@ -339,8 +339,7 @@
                                     class="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-4 text-sm font-bold uppercase tracking-wide focus:ring-1 focus:ring-zinc-950 focus:border-zinc-950 appearance-none cursor-pointer transition-all duration-300 hover:border-zinc-300"
                                     required @change="clearValidation()">
                                     <option value="">-- Pilih Metode Pembayaran --</option>
-                                    <option value="transfer">Bank Transfer</option>
-                                    <option value="ewallet">E-Wallet (GoPay/OVO/Dana/QRIS)</option>
+                                    <option value="midtrans">Midtrans</option>
                                     <option value="cod">Cash on Delivery (COD)</option>
                                 </select>
                                 <div

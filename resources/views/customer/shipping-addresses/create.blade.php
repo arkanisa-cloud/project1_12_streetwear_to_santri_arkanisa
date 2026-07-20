@@ -92,7 +92,8 @@
                         </div>
                         <div class="mt-2 flex items-center gap-2" x-show="errorProvinces && !loadingProvinces" x-cloak>
                             <span class="text-[10px] font-bold text-red-500" x-text="errorProvinces"></span>
-                            <button type="button" @click="retryProvinces()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
+                            <button type="button" @click="retryProvinces()"
+                                class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
                         </div>
                     </div>
 
@@ -130,7 +131,8 @@
                         </div>
                         <div class="mt-2 flex items-center gap-2" x-show="errorCities && !loadingCities" x-cloak>
                             <span class="text-[10px] font-bold text-red-500" x-text="errorCities"></span>
-                            <button type="button" @click="retryCities()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
+                            <button type="button" @click="retryCities()"
+                                class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
                         </div>
                     </div>
 
@@ -168,7 +170,8 @@
                         </div>
                         <div class="mt-2 flex items-center gap-2" x-show="errorDistricts && !loadingDistricts" x-cloak>
                             <span class="text-[10px] font-bold text-red-500" x-text="errorDistricts"></span>
-                            <button type="button" @click="retryDistricts()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
+                            <button type="button" @click="retryDistricts()"
+                                class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
                         </div>
                     </div>
 
@@ -204,9 +207,11 @@
                             <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Loading
                                 subdistricts...</span>
                         </div>
-                        <div class="mt-2 flex items-center gap-2" x-show="errorSubdistricts && !loadingSubdistricts" x-cloak>
+                        <div class="mt-2 flex items-center gap-2" x-show="errorSubdistricts && !loadingSubdistricts"
+                            x-cloak>
                             <span class="text-[10px] font-bold text-red-500" x-text="errorSubdistricts"></span>
-                            <button type="button" @click="retrySubdistricts()" class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
+                            <button type="button" @click="retrySubdistricts()"
+                                class="text-[10px] font-black uppercase tracking-widest text-zinc-950 underline underline-offset-2 hover:text-zinc-600 transition-colors">Retry</button>
                         </div>
                     </div>
 

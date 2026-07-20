@@ -12,27 +12,9 @@ use App\Models\ShippingAddress;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-<<<<<<< HEAD
-
-/**
- * CheckoutController
- * Controller untuk proses checkout order
- *
- * LOGIC CHECKOUT:
- * 1. Validasi stok lagi (critical!)
- * 2. Buat order dengan nomor unik
- * 3. Buat order items
- * 4. Kurangi stok produk
- * 5. Catat di stock_histories
- * 6. Buat payment record
- * 7. Kosongkan cart
- * 8. Gunakan transaction untuk konsistensi
- */
-=======
 use Midtrans\Config;
 use Midtrans\Snap;
 
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
 class CheckoutController extends Controller
 {
 
@@ -52,10 +34,6 @@ class CheckoutController extends Controller
                 ->with('error', 'Silakan pilih barang yang ingin di-checkout!');
         }
 
-<<<<<<< HEAD
-        // Load cart items yang terpilih dengan produk
-=======
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         $cart->load(['cartItems' => function($query) {
             $query->where('is_selected', true)->with('product');
         }]);
@@ -75,69 +53,32 @@ class CheckoutController extends Controller
      */
     public function store(Request $request)
     {
-<<<<<<< HEAD
-        // Validasi input - TAMBAHAN: shipping_courier, shipping_service, shipping_cost
-        $validated = $request->validate([
-            'shipping_address_id' => 'required|exists:shipping_addresses,id',
-            'payment_method' => 'required|in:transfer,ewallet,cod',
-=======
         // Validasi: pastikan payment_method menerima 'midtrans' dan 'cod'
         $validated = $request->validate([
             'shipping_address_id' => 'required|exists:shipping_addresses,id',
             'payment_method' => 'required|in:midtrans,cod', 
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
             'shipping_courier' => 'required|string|in:jne,jnt,pos,tiki,lion',
             'shipping_service' => 'required|string',
             'shipping_cost' => 'required|numeric|min:0',
         ]);
 
-<<<<<<< HEAD
-        // Ambil cart user dengan item yang terpilih saja
-=======
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         $cart = Cart::where('user_id', Auth::id())
             ->with(['cartItems' => function($query) {
                 $query->where('is_selected', true)->with('product');
             }])
             ->first();
 
-<<<<<<< HEAD
-        // Validasi: Cart harus ada dan tidak kosong (yang terpilih)
-=======
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         if (!$cart || $cart->cartItems->isEmpty()) {
             return redirect()
                 ->route('customer.cart.index')
                 ->with('error', 'Tidak ada barang terpilih untuk di-checkout!');
         }
 
-<<<<<<< HEAD
-        // Validasi: Alamat harus milik user yang login
-=======
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
         $address = ShippingAddress::find($validated['shipping_address_id']);
         if ($address->user_id !== Auth::id()) {
             abort(403, 'Unauthorized');
         }
 
-<<<<<<< HEAD
-        // Hitung total keseluruhan (Hanya yang terpilih + Ongkir)
-        $grandTotal = $cart->total + $validated['shipping_cost'];
-
-        // ========================================
-        // DATABASE TRANSACTION - CRITICAL SECTION
-        // ========================================
-        DB::beginTransaction();
-        try {
-            // ----------------------------------------
-            // STEP 1: Validasi stok lagi (critical!)
-            // ----------------------------------------
-            // Stok mungkin sudah berubah sejak user add to cart
-            foreach ($cart->cartItems as $item) {
-                if (!$item->product->hasStock($item->qty)) {
-                    throw new \Exception(
-                        "Stok {$item->product->name} tidak mencukupan! " .
-=======
         $grandTotal = $cart->total + $validated['shipping_cost'];
 
         DB::beginTransaction();
@@ -147,29 +88,18 @@ class CheckoutController extends Controller
                 if (!$item->product->hasStock($item->qty)) {
                     throw new \Exception(
                         "Stok {$item->product->name} tidak mencukupi! " .
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
                         "Stok tersedia: {$item->product->stock}, " .
                         "diminta: {$item->qty}"
                     );
                 }
             }
 
-<<<<<<< HEAD
-            // ----------------------------------------
-            // STEP 2: Buat order
-            // ----------------------------------------
-            $order = Order::create([
-                'user_id' => Auth::id(),
-                'shipping_address_id' => $validated['shipping_address_id'],
-                'order_number' => Order::generateOrderNumber(),
-=======
             // STEP 2: Buat order dengan status awal 'pending' dan 'unpaid'
             $orderNumber = Order::generateOrderNumber();
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'shipping_address_id' => $validated['shipping_address_id'],
                 'order_number' => $orderNumber,
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
                 'total' => $grandTotal,
                 'status' => 'pending',
                 'payment_status' => 'unpaid',
@@ -178,16 +108,8 @@ class CheckoutController extends Controller
                 'shipping_cost' => $validated['shipping_cost'],
             ]);
 
-<<<<<<< HEAD
-            // ----------------------------------------
-            // STEP 3: Buat order items & kurangi stok
-            // ----------------------------------------
-            foreach ($cart->cartItems as $item) {
-                // Buat order item
-=======
             // STEP 3: Buat order items & kurangi stok
             foreach ($cart->cartItems as $item) {
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $item->product_id,
@@ -196,24 +118,6 @@ class CheckoutController extends Controller
                     'subtotal' => $item->qty * $item->price,
                 ]);
 
-<<<<<<< HEAD
-                // Ambil produk
-                $product = $item->product;
-
-                // Hitung stok baru
-                $stockBefore = $product->stock;
-                $stockAfter = $stockBefore - $item->qty;
-
-                // Validasi stok tidak boleh minus
-                if ($stockAfter < 0) {
-                    throw new \Exception("Stok {$product->name} tidak mencukupan!");
-                }
-
-                // Update stok produk
-                $product->update(['stock' => $stockAfter]);
-
-                // Catat di stock history
-=======
                 $product = $item->product;
                 $stockBefore = $product->stock;
                 $stockAfter = $stockBefore - $item->qty;
@@ -224,7 +128,6 @@ class CheckoutController extends Controller
 
                 $product->update(['stock' => $stockAfter]);
 
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
                 StockHistory::create([
                     'product_id' => $product->id,
                     'type' => 'sale',
@@ -236,40 +139,13 @@ class CheckoutController extends Controller
                 ]);
             }
 
-<<<<<<< HEAD
-            // ----------------------------------------
-            // STEP 4: Buat payment record
-            // ----------------------------------------
-=======
             // STEP 4: Buat payment record awal
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
             Payment::create([
                 'order_id' => $order->id,
                 'payment_method' => $validated['payment_method'],
                 'status' => 'pending',
             ]);
 
-<<<<<<< HEAD
-            // ----------------------------------------
-            // STEP 5: Hapus hanya item yang di-checkout dari cart
-            // ----------------------------------------
-            $cart->cartItems()->where('is_selected', true)->delete();
-
-            // ========================================
-            // COMMIT TRANSACTION
-            // ========================================
-            DB::commit();
-
-            // Redirect ke halaman detail order
-            return redirect()
-                ->route('customer.orders.show', $order)
-                ->with('success', 'Order berhasil dibuat! Silakan upload bukti pembayaran.');
-
-        } catch (\Exception $e) {
-            // ========================================
-            // ROLLBACK TRANSACTION jika ada error
-            // ========================================
-=======
             // STEP 5: Integrasi Jalur Pembayaran (Midtrans vs COD)
             if ($validated['payment_method'] === 'midtrans') {
                 Config::$serverKey = config('midtrans.server_key');
@@ -342,7 +218,6 @@ class CheckoutController extends Controller
             }
 
         } catch (\Exception $e) {
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
             DB::rollback();
 
             return back()
@@ -350,40 +225,4 @@ class CheckoutController extends Controller
                 ->withInput();
         }
     }
-<<<<<<< HEAD
-
-    /**
-     * Upload payment proof.
-     * Upload bukti pembayaran
-     */
-    public function uploadPayment(Request $request, Order $order)
-    {
-        // Cek ownership
-        if ($order->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized');
-        }
-
-        // Validasi input
-        $validated = $request->validate([
-            'proof' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Maks 2MB
-        ]);
-
-        // Upload bukti pembayaran
-        $imagePath = $request->file('proof')->store('payments');
-
-        // Update payment
-        $order->payment->update([
-            'proof' => $imagePath,
-            'status' => 'pending', // Menunggu verifikasi admin
-        ]);
-
-        // Update order status
-        $order->update(['payment_status' => 'pending']);
-
-        return back()
-            ->with('success', 'Bukti pembayaran berhasil diupload! ' .
-                'Menunggu verifikasi admin.');
-    }
-=======
->>>>>>> 1cd85e2 (feat: Final Payment Gateway with Midtrans)
 }

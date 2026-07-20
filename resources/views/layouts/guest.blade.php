@@ -9,6 +9,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.bunny.net/css?family=figtree:400,900&display=swap" rel="stylesheet" />
     <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
         .auth-gradient {
             background: radial-gradient(circle at top right, #f4f4f5 0%, #ffffff 100%);
         }

@@ -310,50 +310,5 @@
                 ← Kembali ke List Utama
             </a>
         </div>
-
-        {{-- MODAL ALPINE 1: Input Alasan Penolakan Pembayaran --}}
-        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-sm"
-            x-show="rejectModal" x-transition x-cloak>
-            <div class="bg-white border border-zinc-100 rounded-2xl w-full max-w-md p-6 shadow-xl"
-                @click.away="rejectModal = false">
-                <h3 class="text-sm font-black uppercase tracking-[0.1em] text-zinc-950 mb-2">Alasan Penolakan Berkas</h3>
-                <p class="text-[11px] font-medium text-zinc-400 mb-4 leading-relaxed">Berikan penjelasan detail mengapa
-                    bukti transfer ini tidak sah, agar pelanggan dapat membaca alasannya di dasbor mereka.</p>
-
-                <form action="{{ route('admin.orders.verifyPayment', $order) }}" method="POST" class="space-y-4">
-                    @csrf
-                    <input type="hidden" name="status" value="rejected">
-                    <textarea name="admin_notes" rows="4" required
-                        placeholder="Contoh: Gambar buram, Nominal transfer tidak sesuai, atau Rekening koran tidak terdaftar..."
-                        class="w-full p-4 bg-zinc-50 border-none rounded-xl text-xs font-bold focus:ring-1 focus:ring-zinc-950 text-zinc-800 placeholder-zinc-300"></textarea>
-
-                    <div class="flex justify-end gap-2 text-[10px] font-black uppercase tracking-widest">
-                        <button type="button" @click="rejectModal = false"
-                            class="px-4 py-2.5 border border-zinc-200 rounded-lg text-zinc-500 hover:bg-zinc-50">Batal</button>
-                        <button type="submit"
-                            class="px-5 py-2.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700">Tolak Sekarang</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        {{-- MODAL ALPINE 2: Lightbox View Bukti Pembayaran --}}
-        @if ($order->payment_status === 'pending' && $order->payment && $order->payment->proof)
-            <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-sm"
-                x-show="proofModal" x-transition x-cloak>
-                <div class="relative max-w-3xl w-full bg-white p-2 rounded-2xl shadow-2xl"
-                    @click.away="proofModal = false">
-                    <button type="button" @click="proofModal = false"
-                        class="absolute -top-10 right-0 text-white font-black uppercase tracking-widest text-xs hover:underline">
-                        Tutup [✕]
-                    </button>
-                    <div class="overflow-hidden rounded-xl bg-zinc-50 max-h-[75vh]">
-                        <img src="{{ $order->payment->proof_url }}" alt="Bukti Pembayaran Audit"
-                            class="w-full h-auto object-contain mx-auto">
-                    </div>
-                </div>
-            </div>
-        @endif
-
     </div>
 @endsection

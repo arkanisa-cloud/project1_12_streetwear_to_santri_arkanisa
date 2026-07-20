@@ -18,6 +18,10 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        [x-cloak] {
+            display: none !important;
+        }
+
         .dataTables_wrapper .dataTables_length select {
             padding-right: 2rem;
         }
